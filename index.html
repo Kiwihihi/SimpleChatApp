@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Chat App real time</h1>
+
+    <ul id="messages">
+        
+    </ul>
+    <input type="text" placeholder="User Name..." id="user-name">
+    <form id="chat-form">
+        <input type="text" id="chat-mes">
+        <button id="send-chat">Send</button>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js" 
+        integrity="sha512-WL6WGKMPBiM9PnHRYIn5YEtq0Z8XP4fkVb4qy7PP4vhmYQErJ/dySyXuFIMDf1eEYCXCrQrMJfkNwKc9gsjTjA==" 
+        crossorigin="anonymous" 
+        referrerpolicy="no-referrer">
+    </script>
+    <script>
+        const socket = io()
+      
+        const chatForm = document.querySelector('#chat-form')
+        const chatMes = document.querySelector('#chat-mes')
+        const nameInput = document.querySelector('#user-name')
+
+        nameInput.onchange = (e) => {
+            nameInput.value = e.target.value
+            console.log(e.target.value)
+        }
+
+        const userName = nameInput.value
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            const messages = chatMes.value
+            socket.emit('on-chat', {
+                userName: !nameInput.value ? 'Anonymous' : nameInput.value,
+                messages
+            })
+            chatMes.value = ''
+        })
+
+        const messages = document.querySelector('#messages')
+
+        socket.on('user-chat', (message) => {
+            const chatItem = document.createElement('li')
+            chatItem.textContent = `${message.userName}: ${ message.messages}`
+
+            messages.appendChild(chatItem)
+        })
+    </script>
+</body>
+</html>
